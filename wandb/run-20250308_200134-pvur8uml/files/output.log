@@ -1,7 +1,0 @@
-Epoch: 0
-Traceback (most recent call last):
-  File "C:\Users\Srikrishnan\AppData\Local\Temp\ipykernel_2116\312579587.py", line 49, in train_wandb
-    loss, accuracy = optimizer.gradient_descent(model, x, y, i)
-  File "C:\Users\Srikrishnan\AppData\Local\Temp\ipykernel_2116\661297437.py", line 36, in gradient_descent
-    output, loss = model(x,y)
-ValueError: too many values to unpack (expected 2)
