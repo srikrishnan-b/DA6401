@@ -1,0 +1,20 @@
+wandb_version: 1
+
+activation:
+  value: sigmoid
+batch_size:
+  value: 64
+hidden_size:
+  value: 32
+lr:
+  value: 0.0001
+n_hidden:
+  value: 4
+num_epochs:
+  value: 10
+optimizer:
+  value: nadam
+weight_decay:
+  value: 0
+weights_init:
+  value: random

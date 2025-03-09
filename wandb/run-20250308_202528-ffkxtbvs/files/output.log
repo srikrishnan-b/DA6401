@@ -1,0 +1,35 @@
+Epoch: 0
+validation loss: 2.805897502064791
+validation accuracy: 0.09375
+Average train loss in epoch 0: 41.45171881624581
+Average valid loss in epoch 0: 41.57157298928175
+Average train accuracy in epoch 0: 0.1009384984025559
+Average valid accuracy in epoch 0: 0.10063897763578275
+Epoch: 1
+validation loss: 80.85561461618883
+validation accuracy: 0.09375
+Average train loss in epoch 1: 120.67243316920025
+Average valid loss in epoch 1: 120.80097428186174
+Average train accuracy in epoch 1: 0.10203674121405751
+Average valid accuracy in epoch 1: 0.10193690095846646
+Epoch: 2
+validation loss: 161.7026688599099
+validation accuracy: 0.125
+Average train loss in epoch 2: 204.24737229661613
+Average valid loss in epoch 2: 204.38608407174397
+Average train accuracy in epoch 2: 0.10103833865814696
+Average valid accuracy in epoch 2: 0.10123801916932908
+Epoch: 3
+validation loss: 248.65979672478198
+validation accuracy: 0.125
+Average train loss in epoch 3: 295.70357990007653
+Average valid loss in epoch 3: 295.8577009943712
+Average train accuracy in epoch 3: 0.10323482428115016
+Average valid accuracy in epoch 3: 0.10333466453674121
+Epoch: 4
+validation loss: 345.25063748081
+validation accuracy: 0.125
+Average train loss in epoch 4: 398.32411457642377
+Average valid loss in epoch 4: 398.4983651164744
+Average train accuracy in epoch 4: 0.1112220447284345
+Average valid accuracy in epoch 4: 0.10483226837060702

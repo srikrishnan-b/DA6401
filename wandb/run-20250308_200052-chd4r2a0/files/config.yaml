@@ -1,0 +1,45 @@
+_wandb:
+    value:
+        cli_version: 0.19.8
+        m: []
+        python_version: 3.10.14
+        t:
+            "1":
+                - 2
+                - 3
+                - 55
+            "2":
+                - 2
+                - 3
+                - 55
+            "3":
+                - 2
+                - 14
+                - 23
+                - 55
+            "4": 3.10.14
+            "5": 0.19.8
+            "8":
+                - 1
+                - 3
+                - 5
+            "12": 0.19.8
+            "13": windows-amd64
+activation:
+    value: tanh
+batch_size:
+    value: 64
+hidden_size:
+    value: 32
+lr:
+    value: 0.001
+n_hidden:
+    value: 3
+num_epochs:
+    value: 10
+optimizer:
+    value: nadam
+weight_decay:
+    value: 0
+weights_init:
+    value: random

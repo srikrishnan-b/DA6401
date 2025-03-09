@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "D:\IITM\DA6401\train.py", line 203, in <module>
+    main()
+  File "D:\IITM\DA6401\train.py", line 157, in main
+    for epoch in range(args.num_epochs):
+AttributeError: 'Namespace' object has no attribute 'num_epochs'
+Traceback (most recent call last):
+  File "D:\IITM\DA6401\train.py", line 203, in <module>
+    main()
+  File "D:\IITM\DA6401\train.py", line 157, in main
+    for epoch in range(args.num_epochs):
+AttributeError: 'Namespace' object has no attribute 'num_epochs'

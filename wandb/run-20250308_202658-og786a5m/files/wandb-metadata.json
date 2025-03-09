@@ -1,0 +1,42 @@
+{
+  "os":  "Windows-10-10.0.26100-SP0",
+  "python":  "CPython 3.10.14",
+  "startedAt":  "2025-03-08T14:56:58.103726Z",
+  "program":  "d:\\IITM\\DA6401\\trial.ipynb",
+  "codePath":  "trial.ipynb",
+  "git":  {
+    "remote":  "https://github.com/srikrishnan-b/DA6401",
+    "commit":  "57dddac134dadbc730e2bdd6fdf5f71eb26d130f"
+  },
+  "email":  "bt23s013@smail.iitm.ac.in",
+  "root":  "d:\\IITM\\DA6401",
+  "host":  "Base",
+  "executable":  "c:\\Users\\Srikrishnan\\miniconda3\\envs\\pytorch-gpu\\python.exe",
+  "codePathLocal":  "trial.ipynb",
+  "cpu_count":  8,
+  "cpu_count_logical":  12,
+  "gpu":  "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "221365923840",
+      "used":  "134600777728"
+    }
+  },
+  "memory":  {
+    "total":  "16873545728"
+  },
+  "cpu":  {
+    "count":  8,
+    "countLogical":  12
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+      "memoryTotal":  "6442450944",
+      "cudaCores":  2560,
+      "architecture":  "Ampere"
+    }
+  ],
+  "cudaVersion":  "12.7"
+}

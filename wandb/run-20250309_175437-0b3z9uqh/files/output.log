@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "D:\IITM\DA6401\train.py", line 203, in <module>
+    main()
+  File "D:\IITM\DA6401\train.py", line 165, in main
+    loss, accuracy = optimizer.gradient_descent(model, x, y, i)
+AttributeError: 'GradientDescent' object has no attribute 'gradient_descent'
+Traceback (most recent call last):
+  File "D:\IITM\DA6401\train.py", line 203, in <module>
+    main()
+  File "D:\IITM\DA6401\train.py", line 165, in main
+    loss, accuracy = optimizer.gradient_descent(model, x, y, i)
+AttributeError: 'GradientDescent' object has no attribute 'gradient_descent'
