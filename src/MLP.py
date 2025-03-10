@@ -31,11 +31,11 @@ class Layer:
             return sigmoid(z)
         elif self.g == "softmax":
             return softmax(z)
-        elif self.g == "relu":
+        elif self.g == "ReLU":
             return relu(z)
         elif self.g == "tanh":
             return tanh(z)
-        elif self.g == None:
+        elif self.g == "identity":
             return z
 
 
@@ -49,7 +49,7 @@ class NeuralNet:
         n_hidden,
         loss: str,
         activation=["sigmoid", "softmax"],
-        weights_init="random",
+        weight_init="random",
         weight_decay=0,
     ):
         self.n_layers = n_hidden + 1
@@ -62,7 +62,7 @@ class NeuralNet:
         self.alpha = weight_decay  # L2 regularization parameter
         self.squared_weights_sum = 0
         self.squared_bias_sum = 0
-        self.initialize_weights(init_type=weights_init)
+        self.initialize_weights(init_type=weight_init)
         self.loss_fn = loss
         self.loss = 0
         self.acc = None

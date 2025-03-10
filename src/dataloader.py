@@ -26,8 +26,8 @@ def load_fashion_mnist(batch_size):
     np.random.shuffle(indices)
     x_train = x_train[indices]
     y_train = y_train[indices]
-    x_train, x_valid = x_train[:50000], x_train[50000:]
-    y_train, y_valid = y_train[:50000], y_train[50000:]
+    x_train, x_valid = x_train[:54000], x_train[54000:]
+    y_train, y_valid = y_train[:54000], y_train[54000:]
 
     # reshaping and normalizing the data
     x_train = x_train.reshape(x_train.shape[0], 28 * 28)
@@ -70,8 +70,8 @@ def load_mnist(batch_size):
     np.random.shuffle(indices)
     x_train = x_train[indices]
     y_train = y_train[indices]
-    x_train, x_valid = x_train[:50000], x_train[50000:]
-    y_train, y_valid = y_train[:50000], y_train[50000:]
+    x_train, x_valid = x_train[:54000], x_train[54000:]
+    y_train, y_valid = y_train[:54000], y_train[54000:]
 
     # reshaping and normalizing the data
     x_train = x_train.reshape(x_train.shape[0], 28 * 28)

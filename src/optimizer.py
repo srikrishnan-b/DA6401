@@ -8,22 +8,26 @@ class GradientDescent:
         optimizer="sgd",
         lr=0.01,
         clipping_threshold=1e5,
+        momentum=0.9,
         beta=0.9,
-        beta_2=0.999,
-        eps=1e-10,
+        beta1=0.9,
+        beta2=0.999,
+        epsilon=1e-10,
     ):
         self.optimizer = optimizer
         self.lr = lr
         self.threshold = clipping_threshold
-        self.eps = eps
+        self.momentum = momentum
         self.beta = beta
-        self.beta_2 = beta_2
+        self.epsilon = epsilon
+        self.beta1 = beta1
+        self.beta2 = beta2
 
     def optimize(self, model, x, y, i=0):
         if self.optimizer == "sgd":
             return self.SGD(model, x, y, i)
         elif self.optimizer == "momentum":
-            return self.momentum(model, x, y, i)
+            return self.momentum_gd(model, x, y, i)
         elif self.optimizer == "nag":
             return self.NAG(model, x, y, i)
         elif self.optimizer == "rmsprop":
@@ -151,7 +155,7 @@ class GradientDescent:
         self.backprop(model, x, y, output, i)  # Backpropagation
         return loss, acc
 
-    def momentum(self, model, x, y, i=0):
+    def momentum_gd(self, model, x, y, i=0):
         self.gradw_his = {}
         self.gradb_his = {}
         output, loss, acc = model(x, y)  # Forward pass
@@ -166,8 +170,8 @@ class GradientDescent:
             self.gradb_his[layer.n] = np.zeros_like(layer.bias.reshape(-1, 1))
             layer.temp_weights = copy.deepcopy(layer.weights)
             layer.temp_bias = copy.deepcopy(layer.bias)
-            layer.weights = layer.weights - self.beta * self.gradw_his[layer.n]
-            layer.bias = layer.bias - self.beta * self.gradb_his[layer.n].squeeze()
+            layer.weights = layer.weights - self.momentum * self.gradw_his[layer.n]
+            layer.bias = layer.bias - self.momentum * self.gradb_his[layer.n].squeeze()
 
         output, loss, acc = model(x, y)  # Forward pass
         self.backprop(model, x, y, output, i)  # Backpropagation
@@ -221,10 +225,10 @@ class GradientDescent:
         # Computing current history for Momentum
         for layer in model.layers:
             self.gradw_his[layer.n] = (
-                self.beta * self.gradw_his[layer.n] + grad_w[layer.n]
+                self.momentum * self.gradw_his[layer.n] + grad_w[layer.n]
             )
             self.gradb_his[layer.n] = (
-                self.beta * self.gradb_his[layer.n] + grad_b[layer.n]
+                self.momentum * self.gradb_his[layer.n] + grad_b[layer.n]
             )
 
             # Update weights and biases using Momentum
@@ -235,17 +239,17 @@ class GradientDescent:
         # Computing current history for NAG
         for layer in model.layers:
             self.gradw_his[layer.n] = (
-                self.beta * self.gradw_his[layer.n] + grad_w[layer.n]
+                self.momentum * self.gradw_his[layer.n] + grad_w[layer.n]
             )
             self.gradb_his[layer.n] = (
-                self.beta * self.gradb_his[layer.n] + grad_b[layer.n]
+                self.momentum * self.gradb_his[layer.n] + grad_b[layer.n]
             )
             layer.weights = copy.deepcopy(layer.temp_weights)
             layer.bias = copy.deepcopy(layer.temp_bias)
             layer.weights = layer.weights - self.lr * self.gradw_his[layer.n]
             layer.bias = layer.bias - self.lr * self.gradb_his[layer.n].squeeze()
 
-    def update_weights_rmsprop(self, model, grad_w, grad_b, i):
+    def update_weights_rmsprop(self, model, grad_w, grad_b):
         # Initiating history
         if self.gradw_his == {} and self.gradb_his == {}:
             for layer in model.layers:
@@ -258,7 +262,7 @@ class GradientDescent:
                 self.beta * self.gradw_his[layer.n]
                 + (1 - self.beta) * grad_w[layer.n] ** 2
             )
-            self.gradb_his[layer.n].append(
+            self.gradb_his[layer.n] = (
                 self.beta * self.gradb_his[layer.n]
                 + (1 - self.beta) * grad_b[layer.n] ** 2
             )
@@ -266,12 +270,12 @@ class GradientDescent:
             # Update weights and biases using history
             layer.weights = (
                 layer.weights
-                - (self.lr / np.sqrt(self.gradw_his[layer.n] + self.eps))
+                - (self.lr / np.sqrt(self.gradw_his[layer.n] + self.epsilon))
                 * grad_w[layer.n]
             )
             layer.bias = (
                 layer.bias
-                - (self.lr / np.sqrt(self.gradb_his[layer.n].squeeze() + self.eps))
+                - (self.lr / np.sqrt(self.gradb_his[layer.n].squeeze() + self.epsilon))
                 * grad_b[layer.n].squeeze()
             )
 
@@ -287,33 +291,33 @@ class GradientDescent:
         # Computing current history and momentum for Adam
         for layer in model.layers:
             self.gradw_m[layer.n] = (
-                self.beta * self.gradw_m[layer.n] + (1 - self.beta) * grad_w[layer.n]
+                self.beta1 * self.gradw_m[layer.n] + (1 - self.beta1) * grad_w[layer.n]
             )
             self.gradw_his[layer.n] = (
-                self.beta_2 * self.gradw_his[layer.n]
-                + (1 - self.beta_2) * grad_w[layer.n] ** 2
+                self.beta2 * self.gradw_his[layer.n]
+                + (1 - self.beta2) * grad_w[layer.n] ** 2
             )
 
-            gradw_mhat = self.gradw_m[layer.n] / (1 - np.power(self.beta, i + 1))
-            gradw_vhat = self.gradw_his[layer.n] / (1 - np.power(self.beta_2, i + 1))
+            gradw_mhat = self.gradw_m[layer.n] / (1 - np.power(self.beta1, i + 1))
+            gradw_vhat = self.gradw_his[layer.n] / (1 - np.power(self.beta2, i + 1))
 
             self.gradb_m[layer.n] = (
-                self.beta * self.gradb_m[layer.n] + (1 - self.beta) * grad_b[layer.n]
+                self.beta1 * self.gradb_m[layer.n] + (1 - self.beta1) * grad_b[layer.n]
             )
             self.gradb_his[layer.n] = (
-                self.beta_2 * self.gradb_his[layer.n]
-                + (1 - self.beta_2) * grad_b[layer.n] ** 2
+                self.beta2 * self.gradb_his[layer.n]
+                + (1 - self.beta2) * grad_b[layer.n] ** 2
             )
 
-            gradb_mhat = self.gradb_m[layer.n] / ((1 - np.power(self.beta, i + 1)))
-            gradb_vhat = self.gradb_his[layer.n] / (1 - np.power(self.beta_2, i + 1))
+            gradb_mhat = self.gradb_m[layer.n] / ((1 - np.power(self.beta1, i + 1)))
+            gradb_vhat = self.gradb_his[layer.n] / (1 - np.power(self.beta2, i + 1))
 
             # Update weights and biases using new history and momentum
             layer.weights = layer.weights - (self.lr * gradw_mhat) / (
-                np.sqrt(gradw_vhat) + self.eps
+                np.sqrt(gradw_vhat) + self.epsilon
             )
             layer.bias = layer.bias - (self.lr * gradb_mhat.squeeze()) / (
-                np.sqrt(gradb_vhat.squeeze()) + self.eps
+                np.sqrt(gradb_vhat.squeeze()) + self.epsilon
             )
 
     def update_weights_nadam(self, model, grad_w, grad_b, i):
@@ -326,43 +330,43 @@ class GradientDescent:
 
         for layer in model.layers:
             self.gradw_m[layer.n] = (
-                self.beta * self.gradw_m[layer.n] + (1 - self.beta) * grad_w[layer.n]
+                self.beta1 * self.gradw_m[layer.n] + (1 - self.beta1) * grad_w[layer.n]
             )
             self.gradw_his[layer.n] = (
-                self.beta_2 * self.gradw_his[layer.n]
-                + (1 - self.beta_2) * grad_w[layer.n] ** 2
+                self.beta2 * self.gradw_his[layer.n]
+                + (1 - self.beta2) * grad_w[layer.n] ** 2
             )
 
-            gradw_mhat = self.gradw_m[layer.n] / (1 - np.power(self.beta, i + 1))
-            gradw_vhat = self.gradw_his[layer.n] / (1 - np.power(self.beta_2, i + 1))
+            gradw_mhat = self.gradw_m[layer.n] / (1 - np.power(self.beta1, i + 1))
+            gradw_vhat = self.gradw_his[layer.n] / (1 - np.power(self.beta2, i + 1))
 
             self.gradb_m[layer.n] = (
-                self.beta * self.gradb_m[layer.n] + (1 - self.beta) * grad_b[layer.n]
+                self.beta1 * self.gradb_m[layer.n] + (1 - self.beta1) * grad_b[layer.n]
             )
             self.gradb_his[layer.n] = (
-                self.beta_2 * self.gradb_his[layer.n]
-                + (1 - self.beta_2) * grad_b[layer.n] ** 2
+                self.beta2 * self.gradb_his[layer.n]
+                + (1 - self.beta2) * grad_b[layer.n] ** 2
             )
 
-            gradb_mhat = self.gradb_m[layer.n] / ((1 - np.power(self.beta, i + 1)))
-            gradb_vhat = self.gradb_his[layer.n] / (1 - np.power(self.beta_2, i + 1))
+            gradb_mhat = self.gradb_m[layer.n] / ((1 - np.power(self.beta1, i + 1)))
+            gradb_vhat = self.gradb_his[layer.n] / (1 - np.power(self.beta2, i + 1))
 
             layer.weights = layer.weights - (
                 self.lr
                 * (
-                    (self.beta * gradw_mhat)
-                    + ((1 - self.beta) * grad_w[layer.n])
-                    / (1 - np.power(self.beta, i + 1))
+                    (self.beta1 * gradw_mhat)
+                    + ((1 - self.beta1) * grad_w[layer.n])
+                    / (1 - np.power(self.beta1, i + 1))
                 )
-            ) / (np.sqrt(gradw_vhat) + self.eps)
+            ) / (np.sqrt(gradw_vhat) + self.epsilon)
             layer.bias = layer.bias - (
                 self.lr
                 * (
-                    (self.beta * gradb_mhat.squeeze())
-                    + ((1 - self.beta) * grad_b[layer.n]).squeeze()
-                    / (1 - np.power(self.beta, i + 1))
+                    (self.beta1 * gradb_mhat.squeeze())
+                    + ((1 - self.beta1) * grad_b[layer.n]).squeeze()
+                    / (1 - np.power(self.beta1, i + 1))
                 )
-            ) / (np.sqrt(gradb_vhat.squeeze()) + self.eps)
+            ) / (np.sqrt(gradb_vhat.squeeze()) + self.epsilon)
 
     # ================================END OF SECTION===========================================
 
@@ -400,7 +404,7 @@ class GradientDescent:
         if activation == "sigmoid":  # for sigmoid
 
             return grad_act * act * (1 - act)
-        elif activation == "relu":  # for relu
+        elif activation == "ReLU":  # for relu
             return grad_act * (act > 0)
         elif activation == "tanh":  # for tanh
             return grad_act * (1 - act**2)
