@@ -4,7 +4,7 @@ import os
 from utils import one_hot_encode, batch_data
 import matplotlib.pyplot as plt
 from keras.datasets import fashion_mnist, mnist
-
+import wandb 
 
 def load_fashion_mnist(batch_size):
     (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
@@ -19,7 +19,7 @@ def load_fashion_mnist(batch_size):
         plt.imshow(x_train[sample[i]], cmap="gray")
         plt.title(f"label={i}", fontsize=8)
 
-    plt.show()
+    wandb.log({"fashion_mnist examples": plt})
 
     # getting validation data
     indices = list(np.arange(len(x_train)))
@@ -62,9 +62,8 @@ def load_mnist(batch_size):
         plt.subplot(4, 3, i + 1)
         plt.imshow(x_train[sample[i]], cmap="gray")
         plt.title(f"label={i}", fontsize=8)
-
-    plt.show()
-
+        wandb.log({"mnist examples": plt})
+    
     # getting validation data
     indices = list(np.arange(len(x_train)))
     np.random.shuffle(indices)

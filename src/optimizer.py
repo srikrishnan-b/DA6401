@@ -408,6 +408,8 @@ class GradientDescent:
             return grad_act * (act > 0)
         elif activation == "tanh":  # for tanh
             return grad_act * (1 - act**2)
+        elif activation == "identity":
+            return grad_act
 
     def grad_weights(self, grad_preact, input):
         return grad_preact @ input.transpose(0, 2, 1)

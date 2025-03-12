@@ -94,7 +94,7 @@ def parse_args():
         type=str,
         default="sigmoid",
         help="Activation function to use",
-        choices=["identity", "sigmoid", "relu", "tanh"],
+        choices=["identity", "sigmoid", "ReLU", "tanh"],
     )
     args = parser.parse_args()
     return args
@@ -133,15 +133,18 @@ def main():
     else:
         raise ValueError("Dataset not supported")
 
+
     threshold = 1  # Clipping threshold for gradient clipping
     loss = Loss(loss_fn=args.loss)
     optimizer = GradientDescent(
         optimizer=args.optimizer,
         lr=args.learning_rate,
         clipping_threshold=threshold,
-        beta=args.momentum,
-        beta_2=args.beta2,
-        eps=args.epsilon,
+        momentum = args.momentum,
+        beta=args.beta,
+        beta1=args.beta1,
+        beta2=args.beta2,
+        epsilon=args.epsilon,
     )
     model = NeuralNet(
         input_size=784,
@@ -150,7 +153,7 @@ def main():
         n_hidden=args.num_layers,
         loss=loss,
         activation=[args.activation, "softmax"],
-        weights_init=args.weight_init,
+        weight_init=args.weight_init,
         weight_decay=args.weight_decay,
     )
 
@@ -165,16 +168,9 @@ def main():
             loss, accuracy = optimizer.optimize(model, x, y, i)
             batch_train_loss.append(loss)
             batch_train_accuracy.append(accuracy)
+            wandb.log({"train/batch_loss": loss})
 
-            metrics = {
-                "train/train_loss": loss,
-                "train/train_accuracy": accuracy,
-                "train/epoch": epoch,
-                "train/steps": i + 1,
-            }
-
-            if i + 1 < math.ceil(len(train) / args.batch_size):
-                wandb.log(metrics)
+               
 
             i += 1
 
@@ -183,19 +179,14 @@ def main():
             batch_valid_loss.append(valid_loss)
             batch_valid_accuracy.append(valid_accuracy)
 
-        val_metrics = {
-            "val/val_loss": np.mean(batch_valid_loss),
-            "val/val_accuracy": np.mean(batch_valid_accuracy),
-            "val/epoch": epoch,
-        }
-        wandb.log({**metrics, **val_metrics})
+        wandb.log({"epoch": epoch + 1, "train/loss": np.mean(batch_train_loss), "train/accuracy": np.mean(batch_train_accuracy), "val/loss": np.mean(batch_valid_loss), "val/accuracy": np.mean(batch_valid_accuracy)})
         print(
-            f"Epoch: {epoch}, Train Loss: {np.mean(batch_train_loss)}, Valid Loss: {np.mean(batch_valid_loss)}"
+            f"Epoch: {epoch}, Train Loss: {np.mean(batch_train_loss)}, Valid Loss: {np.mean(batch_valid_loss)}, Valid Accuracy: {np.mean(batch_valid_accuracy)}"
         )
 
     _, _, test_acc = model.predict(test[0], test[1])
     wandb.summary["test_accuracy"] = test_acc
-
+    print(f"Test Accuracy: {test_acc}")
     wandb.finish()
 
 
