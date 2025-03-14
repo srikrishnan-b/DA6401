@@ -156,15 +156,17 @@ class GradientDescent:
         return loss, acc
 
     def momentum_gd(self, model, x, y, i=0):
-        self.gradw_his = {}
-        self.gradb_his = {}
+        if i == 0:
+            self.gradw_his = {}
+            self.gradb_his = {}
         output, loss, acc = model(x, y)  # Forward pass
         self.backprop(model, x, y, output, i)  # Backpropagation
         return loss, acc
 
     def NAG(self, model, x, y, i=0):
-        self.gradw_his = {}
-        self.gradb_his = {}
+        if i == 0:
+            self.gradw_his = {}
+            self.gradb_his = {}
         for layer in model.layers:
             self.gradw_his[layer.n] = np.zeros_like(layer.weights)
             self.gradb_his[layer.n] = np.zeros_like(layer.bias.reshape(-1, 1))
@@ -178,27 +180,30 @@ class GradientDescent:
         return loss, acc
 
     def RMSprop(self, model, x, y, i=0):
-        self.gradw_his = {}
-        self.gradb_his = {}
+        if i == 0:
+            self.gradw_his = {}
+            self.gradb_his = {}
         output, loss, acc = model(x, y)  # Forward pass
         self.backprop(model, x, y, output, i)  # Backpropagation
         return loss, acc
 
     def Adam(self, model, x, y, i=0):
-        self.gradw_his = {}
-        self.gradb_his = {}
-        self.gradw_m = {}
-        self.gradb_m = {}
+        if i == 0:
+            self.gradw_his = {}
+            self.gradb_his = {}
+            self.gradw_m = {}
+            self.gradb_m = {}
 
         output, loss, acc = model(x, y)  # Forward pass
         self.backprop(model, x, y, output, i)  # Backpropagation
         return loss, acc
 
     def Nadam(self, model, x, y, i=0):
-        self.gradw_his = {}
-        self.gradb_his = {}
-        self.gradw_m = {}
-        self.gradb_m = {}
+        if i == 0:
+            self.gradw_his = {}
+            self.gradb_his = {}
+            self.gradw_m = {}
+            self.gradb_m = {}
 
         output, loss, acc = model(x, y)  # Forward pass
         self.backprop(model, x, y, output, i)  # Backpropagation
@@ -385,7 +390,10 @@ class GradientDescent:
         if loss_fn.loss_fn == "cross_entropy":
             return -(y_true - y_pred)
         elif loss_fn.loss_fn == "mse":
-            grad = []
+            S = np.sum((y_pred - y_true) * y_pred, axis=1, keepdims=True)
+            grad_pre_final = y_pred * ((y_pred - y_true) - S)
+
+            """grad = []
             for y, y_hat in zip(y_true, y_pred):
                 grad.append(
                     y_hat
@@ -394,8 +402,8 @@ class GradientDescent:
                         - np.tile((y_hat - y).T, (y_hat.shape[0], 1)) @ y_hat
                         + (y_hat - y) * y_hat**2
                     )
-                )
-            return np.array(grad)
+                )"""
+            return grad_pre_final
 
     def grad_hidden(self, W, grad_next_preact):
         return W.T @ grad_next_preact
