@@ -11,6 +11,7 @@ from dataloader import load_fashion_mnist, load_mnist
 from model import NeuralNet
 from optimizer import GradientDescent
 from utils import confusion_matrix
+import matplotlib.pyplot as plt
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -190,10 +191,28 @@ def main():
             f"Epoch: {epoch}, Train Loss: {np.mean(batch_train_loss)}, Valid Loss: {np.mean(batch_valid_loss)}, Valid Accuracy: {np.mean(batch_valid_accuracy)}"
         )
 
-    _, _, test_acc = model.predict(test[0], test[1])
+    # Testing model
+    _, _, test_acc = model(test[0], test[1])
     wandb.summary["test_accuracy"] = test_acc
     print(f"Test Accuracy: {test_acc}")
-    
+    _, _, test_acc = model(test[0], test[1])
+    print(f"Test Accuracy: {test_acc}")
+    predictions = np.argmax(model.predict(test[0]), axis=1)
+    true = np.argmax(test[1], axis=1)
+    wandb.summary["test_accuracy"] = test_acc
+
+    # Confusion matrix
+    conf = confusion_matrix(true, predictions)
+    plt.figure(figsize=(10, 8))
+    plt.imshow(conf, interpolation='nearest', cmap=plt.cm.Blues)
+    plt.title('Confusion Matrix - Test set')
+    plt.colorbar()
+    tick_marks = np.arange(len(np.unique(true)))
+    plt.xticks(tick_marks, tick_marks)
+    plt.yticks(tick_marks, tick_marks)
+    plt.ylabel('Truth')
+    plt.xlabel('Prediction')
+    wandb.log({"Confusion matrix": wandb.Image(plt)})
 
 
 
