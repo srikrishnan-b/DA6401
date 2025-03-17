@@ -150,18 +150,12 @@ class NeuralNet:
         self.acc = self.accuracy(x, y)
         return x, self.loss, self.acc
 
-    def predict(self, x, y=None):
+    def predict(self, x):
         for layer in self.layers:
             x = layer(x)
             self.squared_weights_sum += np.sum(layer.squared_weights)
 
-        self.loss = (
-            self.loss_fn(x, y) + self.alpha * (self.squared_weights_sum) / 2
-        )  # L2 regularization loss term
-        self.squared_weights_sum = 0
-        if y is not None:
-            self.acc = self.accuracy(x, y)
-        return x, self.loss, self.acc
+        return x
 
     def accuracy(self, y_pred, y_true):
         correct = np.argmax(y_pred, axis=1) == np.argmax(y_true, axis=1)

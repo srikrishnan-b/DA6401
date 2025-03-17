@@ -10,7 +10,7 @@ from utils import Loss
 from dataloader import load_fashion_mnist, load_mnist
 from model import NeuralNet
 from optimizer import GradientDescent
-
+from utils import confusion_matrix
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -33,10 +33,10 @@ def parse_args():
         choices=["fashion_mnist", "mnist"],
     )
     parser.add_argument(
-        "--epochs", type=int, default=1, help="Number of epochs to train"
+        "--epochs", type=int, default=10, help="Number of epochs to train"
     )
     parser.add_argument(
-        "--batch_size", type=int, default=4, help="Batch size for training"
+        "--batch_size", type=int, default=32, help="Batch size for training"
     )
     parser.add_argument(
         "--loss",
@@ -48,30 +48,30 @@ def parse_args():
     parser.add_argument(
         "--optimizer",
         type=str,
-        default="sgd",
+        default="nadam",
         help="Optimizer to use",
         choices=["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"],
     )
     parser.add_argument(
-        "--learning_rate", type=float, default=0.1, help="Learning rate for optimizer"
+        "--learning_rate", type=float, default=0.0003, help="Learning rate for optimizer"
     )
     parser.add_argument(
         "--momentum",
         type=float,
-        default=0.5,
+        default=0.9,
         help="Momentum for Momnetum and NAG optimizer",
     )
     parser.add_argument(
-        "--beta", type=float, default=0.5, help="Beta for RMSProp optimizer"
+        "--beta", type=float, default=0.9, help="Beta for RMSProp optimizer"
     )
     parser.add_argument(
-        "--beta1", type=float, default=0.5, help="Beta1 for Adam and Nadam optimizer"
+        "--beta1", type=float, default=0.9, help="Beta1 for Adam and Nadam optimizer"
     )
     parser.add_argument(
-        "--beta2", type=float, default=0.5, help="Beta2 for Adam and Nadam optimizer"
+        "--beta2", type=float, default=0.999, help="Beta2 for Adam and Nadam optimizer"
     )
     parser.add_argument(
-        "--epsilon", type=float, default=1e-6, help="Epsilon for optimizers"
+        "--epsilon", type=float, default=1e-8, help="Epsilon for optimizers"
     )
     parser.add_argument(
         "--weight_decay", type=float, default=0.0, help="Weight decay for optimizers"
@@ -79,20 +79,20 @@ def parse_args():
     parser.add_argument(
         "--weight_init",
         type=str,
-        default="random",
+        default="xavier",
         help="Weight initialization for model",
         choices=["random", "xavier"],
     )
     parser.add_argument(
-        "--num_layers", type=int, default=1, help="Number of hidden layers in model"
+        "--num_layers", type=int, default=5, help="Number of hidden layers in model"
     )
     parser.add_argument(
-        "--hidden_size", type=int, default=4, help="Hidden size of each layer"
+        "--hidden_size", type=int, default=64, help="Hidden size of each layer"
     )
     parser.add_argument(
         "--activation",
         type=str,
-        default="sigmoid",
+        default="ReLU",
         help="Activation function to use",
         choices=["identity", "sigmoid", "ReLU", "tanh"],
     )
@@ -193,6 +193,10 @@ def main():
     _, _, test_acc = model.predict(test[0], test[1])
     wandb.summary["test_accuracy"] = test_acc
     print(f"Test Accuracy: {test_acc}")
+    
+
+
+
     wandb.finish()
 
 

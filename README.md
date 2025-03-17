@@ -39,10 +39,10 @@ python hyperparameter_search.py --wandbproject "project" --count 10
 ```
 
 ## Code Organization
-
+```
 ├── notebooks/                            # Notebooks for training and sweeps
 |   ├── hyperparameter_search.ipynb       # Hyperparameter search
-│   ├── train.ipynb                          # Training 
+│   ├── train.ipynb                       # Training 
 ├── src/                                  # Source code directory
 │   ├── dataloader.py                     # Loading data
 │   ├── model.py                          # Neural network implementation
@@ -55,7 +55,7 @@ python hyperparameter_search.py --wandbproject "project" --count 10
 ├── environment.yml                       # Packages
 ├── requirements.txt                      # Packages
 ├── README.md                             # Documentation 
-
+```
 
 The `src` directory contains codes used in `train.py` and `hyperparameter_search.py`. 
 - `dataloader.py` contains functions to load fashion-MNIST (MNIST) dataset and makes train, validation and test splits; labels are one-hot encoded and batches are created for train and valid splits. 
@@ -67,3 +67,7 @@ The `backprop` function calls the following functions in order: `compute_grads()
 - `model.py` implements two clases: `Layer` and `NeuralNet`. A function called `train_wandb` is defined to be used for wandb sweeps. 
 
 The notebooks follow the same structure as the python scipts. 
+
+
+Link to wandb report: https://wandb.ai/deeplearn24/DLA1_cross_entropy_sweep/reports/BT23S013-DA6401-Assignment-1--VmlldzoxMTgyNzE1Mg
+Link to GitHub repo: https://github.com/srikrishnan-b/DA6401

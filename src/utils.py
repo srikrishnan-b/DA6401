@@ -70,3 +70,11 @@ def batch_data(x, y, batch_size):
 
 
 # ===============================================================================
+
+
+def confusion_matrix(y_true, y_pred):
+    n = len(np.unique(y_true))
+    matrix = np.zeros((n, n))
+    for i in range(len(y_true)):
+        matrix[y_true[i], y_pred[i]] += 1
+    return matrix
