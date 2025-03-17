@@ -1,0 +1,27 @@
+{
+    "method": "bayes",
+    "name": "bayesian_mse_comparison",
+
+    "metric": {
+        "name": "val_accuracy",
+        "goal": "maximize"
+    },
+
+    "parameters": {
+        "epochs": {"values": [5, 10]},
+        "num_layers": {"values": [3, 4, 5]},
+        "hidden_size": {"values": [32, 64, 128]},
+        "weight_decay": {"values": [0, 0.0005, 0.5]},  
+        "learning_rate": {"distribution": "uniform", "min": 1e-5, "max": 1e-2},
+        "optimizer": {"values": ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"]},    
+        "batch_size": {"values": [16, 32, 64]},
+        "weight_init": {"values": ["random", "xavier"]},
+        "activation": {"values": ["sigmoid","ReLU", "tanh"]},
+        "loss": {"values": ["mse"]},
+        "momentum": {"values": [0.9]},
+        "beta": {"values": [0.9]},
+        "beta1": {"values": [0.9]},
+        "beta2": {"values": [0.999]},
+        "epsilon": {"values": [1e-8]}
+    }
+}

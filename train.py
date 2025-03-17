@@ -8,7 +8,7 @@ import wandb
 import argparse
 from utils import Loss
 from dataloader import load_fashion_mnist, load_mnist
-from MLP import NeuralNet
+from model import NeuralNet
 from optimizer import GradientDescent
 
 
@@ -133,14 +133,13 @@ def main():
     else:
         raise ValueError("Dataset not supported")
 
-
     threshold = 1  # Clipping threshold for gradient clipping
     loss = Loss(loss_fn=args.loss)
     optimizer = GradientDescent(
         optimizer=args.optimizer,
         lr=args.learning_rate,
         clipping_threshold=threshold,
-        momentum = args.momentum,
+        momentum=args.momentum,
         beta=args.beta,
         beta1=args.beta1,
         beta2=args.beta2,
@@ -156,21 +155,20 @@ def main():
         weight_init=args.weight_init,
         weight_decay=args.weight_decay,
     )
+    i = 0
 
     for epoch in range(args.epochs):
-        i = 0
+
         batch_train_loss = []
         batch_valid_loss = []
         batch_train_accuracy = []
         batch_valid_accuracy = []
 
-        for (x, y), (x_val, y_val) in zip(train, valid):
+        for x, y in train:
             loss, accuracy = optimizer.optimize(model, x, y, i)
             batch_train_loss.append(loss)
             batch_train_accuracy.append(accuracy)
             wandb.log({"train/batch_loss": loss})
-
-               
 
             i += 1
 
@@ -179,7 +177,15 @@ def main():
             batch_valid_loss.append(valid_loss)
             batch_valid_accuracy.append(valid_accuracy)
 
-        wandb.log({"epoch": epoch + 1, "train/loss": np.mean(batch_train_loss), "train/accuracy": np.mean(batch_train_accuracy), "val/loss": np.mean(batch_valid_loss), "val/accuracy": np.mean(batch_valid_accuracy)})
+        wandb.log(
+            {
+                "epoch": epoch + 1,
+                "train/loss": np.mean(batch_train_loss),
+                "train/accuracy": np.mean(batch_train_accuracy),
+                "val/loss": np.mean(batch_valid_loss),
+                "val/accuracy": np.mean(batch_valid_accuracy),
+            }
+        )
         print(
             f"Epoch: {epoch}, Train Loss: {np.mean(batch_train_loss)}, Valid Loss: {np.mean(batch_valid_loss)}, Valid Accuracy: {np.mean(batch_valid_accuracy)}"
         )

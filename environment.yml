@@ -1,0 +1,12 @@
+name: dl_assign
+dependencies:
+  - python=3.10
+  - numpy
+  - pandas
+  - matplotlib
+  - keras
+  - wandb
+  - tensorflow
+  - pip
+  - pip:
+      - wandb  

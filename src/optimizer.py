@@ -7,7 +7,7 @@ class GradientDescent:
         self,
         optimizer="sgd",
         lr=0.01,
-        clipping_threshold=1e5,
+        clipping_threshold=1,
         momentum=0.9,
         beta=0.9,
         beta1=0.9,
@@ -68,7 +68,7 @@ class GradientDescent:
                     np.sum(
                         self.grad_weights(
                             grad_a[layer.n],
-                            model.layers[layer.n - 1].act.reshape(
+                            model.layers[layer.n - 1].h.reshape(
                                 batch_size, model.hidden_size, 1
                             ),
                         ),
@@ -85,9 +85,7 @@ class GradientDescent:
                 )
                 grad_a[layer.n] = self.grad_preact(
                     grad_h[layer.n],
-                    model.layers[layer.n].preact.reshape(
-                        batch_size, model.hidden_size, 1
-                    ),
+                    model.layers[layer.n].a.reshape(batch_size, model.hidden_size, 1),
                     model.hidden_activation,
                 )
 
@@ -108,7 +106,7 @@ class GradientDescent:
                         np.sum(
                             self.grad_weights(
                                 grad_a[layer.n],
-                                model.layers[layer.n - 1].act.reshape(
+                                model.layers[layer.n - 1].h.reshape(
                                     batch_size, model.hidden_size, 1
                                 ),
                             ),
@@ -167,13 +165,14 @@ class GradientDescent:
         if i == 0:
             self.gradw_his = {}
             self.gradb_his = {}
+            for layer in model.layers:
+                self.gradw_his[layer.n] = np.zeros_like(layer.weights)
+                self.gradb_his[layer.n] = np.zeros_like(layer.bias.reshape(-1, 1))
         for layer in model.layers:
-            self.gradw_his[layer.n] = np.zeros_like(layer.weights)
-            self.gradb_his[layer.n] = np.zeros_like(layer.bias.reshape(-1, 1))
             layer.temp_weights = copy.deepcopy(layer.weights)
             layer.temp_bias = copy.deepcopy(layer.bias)
-            layer.weights = layer.weights - self.momentum * self.gradw_his[layer.n]
-            layer.bias = layer.bias - self.momentum * self.gradb_his[layer.n].squeeze()
+            layer.weights = layer.weights - (self.beta * self.gradw_his[layer.n])
+            layer.bias = layer.bias - (self.beta * self.gradb_his[layer.n].squeeze())
 
         output, loss, acc = model(x, y)  # Forward pass
         self.backprop(model, x, y, output, i)  # Backpropagation
@@ -230,29 +229,32 @@ class GradientDescent:
         # Computing current history for Momentum
         for layer in model.layers:
             self.gradw_his[layer.n] = (
-                self.momentum * self.gradw_his[layer.n] + grad_w[layer.n]
-            )
+                self.momentum * self.gradw_his[layer.n]
+            ) + self.lr * grad_w[layer.n]
+
             self.gradb_his[layer.n] = (
-                self.momentum * self.gradb_his[layer.n] + grad_b[layer.n]
-            )
+                self.momentum * self.gradb_his[layer.n]
+            ) + self.lr * grad_b[layer.n]
 
             # Update weights and biases using Momentum
-            layer.weights = layer.weights - self.lr * self.gradw_his[layer.n]
-            layer.bias = layer.bias - self.lr * self.gradb_his[layer.n].squeeze()
+            layer.weights = layer.weights - self.gradw_his[layer.n]
+            layer.bias = layer.bias - self.gradb_his[layer.n].squeeze()
 
     def update_weights_nag(self, model, grad_w, grad_b):
         # Computing current history for NAG
         for layer in model.layers:
             self.gradw_his[layer.n] = (
-                self.momentum * self.gradw_his[layer.n] + grad_w[layer.n]
-            )
+                self.beta * self.gradw_his[layer.n]
+            ) + self.lr * grad_w[layer.n]
+
             self.gradb_his[layer.n] = (
-                self.momentum * self.gradb_his[layer.n] + grad_b[layer.n]
-            )
+                self.beta * self.gradb_his[layer.n]
+            ) + self.lr * grad_b[layer.n]
+
             layer.weights = copy.deepcopy(layer.temp_weights)
             layer.bias = copy.deepcopy(layer.temp_bias)
-            layer.weights = layer.weights - self.lr * self.gradw_his[layer.n]
-            layer.bias = layer.bias - self.lr * self.gradb_his[layer.n].squeeze()
+            layer.weights = layer.weights - self.gradw_his[layer.n]
+            layer.bias = layer.bias - self.gradb_his[layer.n].squeeze()
 
     def update_weights_rmsprop(self, model, grad_w, grad_b):
         # Initiating history
@@ -267,6 +269,7 @@ class GradientDescent:
                 self.beta * self.gradw_his[layer.n]
                 + (1 - self.beta) * grad_w[layer.n] ** 2
             )
+
             self.gradb_his[layer.n] = (
                 self.beta * self.gradb_his[layer.n]
                 + (1 - self.beta) * grad_b[layer.n] ** 2
@@ -278,6 +281,7 @@ class GradientDescent:
                 - (self.lr / np.sqrt(self.gradw_his[layer.n] + self.epsilon))
                 * grad_w[layer.n]
             )
+
             layer.bias = (
                 layer.bias
                 - (self.lr / np.sqrt(self.gradb_his[layer.n].squeeze() + self.epsilon))
@@ -298,6 +302,7 @@ class GradientDescent:
             self.gradw_m[layer.n] = (
                 self.beta1 * self.gradw_m[layer.n] + (1 - self.beta1) * grad_w[layer.n]
             )
+
             self.gradw_his[layer.n] = (
                 self.beta2 * self.gradw_his[layer.n]
                 + (1 - self.beta2) * grad_w[layer.n] ** 2
@@ -386,23 +391,13 @@ class GradientDescent:
         elif loss == "mse":
             return y_pred - y_true
 
-    def grad_output(self, y_true, y_pred, loss_fn="cross_entropy"):
+    def grad_output(self, y_true, y_pred, loss_fn):
         if loss_fn.loss_fn == "cross_entropy":
             return -(y_true - y_pred)
         elif loss_fn.loss_fn == "mse":
-            S = np.sum((y_pred - y_true) * y_pred, axis=1, keepdims=True)
+            S = np.sum((y_pred - y_true) * y_pred, axis=1, keepdims=True)  # Jacobian
             grad_pre_final = y_pred * ((y_pred - y_true) - S)
 
-            """grad = []
-            for y, y_hat in zip(y_true, y_pred):
-                grad.append(
-                    y_hat
-                    * (
-                        (y_hat - y) * (1 - y_hat)
-                        - np.tile((y_hat - y).T, (y_hat.shape[0], 1)) @ y_hat
-                        + (y_hat - y) * y_hat**2
-                    )
-                )"""
             return grad_pre_final
 
     def grad_hidden(self, W, grad_next_preact):

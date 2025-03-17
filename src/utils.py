@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 # ===============================================================================
 # Activation functions
 # ===============================================================================
@@ -13,7 +12,8 @@ def sigmoid(x):
 def softmax(x):
     max_x = np.max(x, axis=1, keepdims=True)
     x = x - max_x
-    return np.exp(x) / np.sum(np.exp(x), axis=1, keepdims=True)
+    exp = np.exp(x)
+    return exp / np.sum(exp, axis=1, keepdims=True)
 
 
 def relu(x):
@@ -38,14 +38,14 @@ class Loss:
         if self.loss_fn == "cross_entropy":
             return np.mean(self.cross_entropy(y_true, y_pred))
         elif self.loss_fn == "mse":
-            return np.mean(self.mse(y_true, y_pred))
+            return np.mean(self.mse(y_true, y_pred)) / 2
 
     def cross_entropy(self, y_true, y_pred):
-        y_pred = np.clip(y_pred, 1e-10, 1 - 1e-10)  # To avoid log(0) and log(1)
+        y_pred = np.clip(y_pred, 1e-5, 1 - 1e-5)  # To avoid log(0) and log(1)
         return -np.log(np.sum(y_true * y_pred, axis=1))
 
     def mse(self, y_true, y_pred):
-        return np.mean(np.sum((y_true - y_pred) ** 2, axis=1))
+        return np.sum((y_true - y_pred) ** 2, axis=1)
 
 
 # ===============================================================================

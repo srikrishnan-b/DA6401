@@ -1,0 +1,18 @@
+{
+    "dataset": "fashion_mnist",
+    "epochs": 5,
+    "batch_size": 32,
+    "loss": "cross_entropy",
+    "optimizer": "sgd",
+    "learning_rate": 0.0001,
+    "momentum": 0.9,
+    "beta": 0.9,
+    "beta1": 0.9,
+    "beta2": 0.999,
+    "epsilon": 1e-8,
+    "weight_decay": 0,
+    "weight_init": "xavier",
+    "num_layers": 2,
+    "hidden_size": 32,
+    "activation": "ReLU"
+}
