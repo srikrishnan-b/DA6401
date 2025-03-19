@@ -69,7 +69,7 @@ The `backprop` function calls the following functions in order: `compute_grads()
 The notebooks follow the same structure as the python scipts. 
 
 ---
-Link to wandb report: https://wandb.ai/deeplearn24/DLA1_cross_entropy_sweep/reports/BT23S013-DA6401-Assignment-1--VmlldzoxMTgyNzE1Mg
+Link to wandb report: [Link](https://wandb.ai/deeplearn24/DLA1_cross_entropy_sweep/reports/BT23S013-DA6401-Assignment-1--VmlldzoxMTgyNzE1Mg?accessToken=1t2873pn56wpla5n7ro5y6yust2uwo6jnq6m32uykfskm0il20vcr05f339hw7qc)
 ---
-Link to GitHub repo: https://github.com/srikrishnan-b/DA6401
+Link to GitHub repo: [Link](https://github.com/srikrishnan-b/DA6401)
 ---
